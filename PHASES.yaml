@@ -1,0 +1,108 @@
+phases:
+  - id: research
+    name: 市場・外部調査
+    dir: 01-idea-to-scope
+    purpose: 市場が存在するか、既存の代替手段は何かを調査する
+    ai: Gemini
+    input:
+      - アイデア（1文）
+    output:
+      - templates/IDEA_RESEARCH.md（記入済み）
+    done_when:
+      - 想定ユーザー・課題・競合・差別化が言語化されている
+      - GO/NOGO判断が人によって行われている
+    next: requirements（GOの場合のみ）
+
+  - id: requirements
+    name: 要件定義
+    dir: 01-idea-to-scope
+    purpose: MVPスコープをMust/Should/Couldで定義する
+    ai: ChatGPT
+    input:
+      - templates/IDEA_RESEARCH.md（記入済み）
+    output:
+      - templates/REQUIREMENTS.md（記入済み）
+    done_when:
+      - Must要件が列挙されている
+      - 「やらないこと」が明記されている
+      - 成功条件が定義されている
+    next: template-selection
+
+  - id: template-selection
+    name: テンプレ選択
+    dir: 02-template-selection
+    purpose: 要件に合う技術テンプレ（A/B/C）を選択する
+    ai: Claude
+    input:
+      - templates/REQUIREMENTS.md（記入済み）
+    output:
+      - 02-template-selection/decision.md（記入済み）
+    done_when:
+      - テンプレA/B/Cのいずれかが選択されている
+      - 選択理由と判断基準が記録されている
+    next: design
+
+  - id: design
+    name: 基本設計
+    dir: 03-design
+    purpose: 画面・データモデル・APIの最小設計を行う
+    ai: Claude
+    input:
+      - 02-template-selection/decision.md
+      - templates/REQUIREMENTS.md
+    output:
+      - 03-design/architecture.md（記入済み）
+    done_when:
+      - 画面・機能一覧がある
+      - データモデルが定義されている
+      - 非機能要件（コスト・ログ・監視）が記載されている
+    next: implementation
+
+  - id: implementation
+    name: 実装サイクル
+    dir: 04-implementation-loop
+    purpose: 1〜2日単位で1ユースケースを縦に動かす
+    ai: Claude Code / Mac版Codex / Cursor
+    input:
+      - 03-design/architecture.md
+      - templates/IMPLEMENTATION_TASK.md
+    output:
+      - 動作するコード
+      - templates/CYCLE_PLAN.md（サイクルごと）
+    done_when:
+      - 対象ユースケースが縦に動く
+      - 既存構成を壊していない
+      - 人レビューでスコープ逸脱がない
+    next: quality（サイクル完了後） / implementation（次サイクル）
+
+  - id: quality
+    name: 品質・CI・テスト
+    dir: 05-quality-ci-test
+    purpose: 段階的にCI・テストを導入する
+    ai: Claude Code / Cursor
+    input:
+      - 実装済みコード
+    output:
+      - CI設定
+      - checklists/CI_MINIMUM.md（確認済み）
+    done_when:
+      - lint / typecheck / build が通る
+      - フェーズ対応のテストが整備されている
+    next: release
+
+  - id: release
+    name: リリース・運用
+    dir: 06-release-ops
+    purpose: MVP公開と最低限の運用体制を整える
+    ai: Claude Code
+    input:
+      - checklists/MVP_DONE.md（確認済み）
+      - checklists/RELEASE_CHECK.md（確認済み）
+    output:
+      - デプロイ済みアプリ
+    done_when:
+      - Must要件がすべて動作する
+      - CIが通過している
+      - 秘密情報がコードに含まれていない
+      - 障害時の一次対応が想定できている
+    next: null

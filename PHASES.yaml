@@ -62,7 +62,11 @@ phases:
     name: 実装サイクル
     dir: 04-implementation-loop
     purpose: 1〜2日単位で1ユースケースを縦に動かす
-    ai: Claude Code / Mac版Codex / Cursor
+    ai:
+      primary: Claude Code
+      support:
+        - Mac版Codex
+        - Cursor
     input:
       - 03-design/architecture.md
       - templates/IMPLEMENTATION_TASK.md

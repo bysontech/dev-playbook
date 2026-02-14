@@ -11,7 +11,9 @@ phases:
     done_when:
       - 想定ユーザー・課題・競合・差別化が言語化されている
       - GO/NOGO判断が人によって行われている
-    next: requirements（GOの場合のみ）
+    next:
+      default: requirements
+      condition: GO
 
   - id: requirements
     name: 要件定義
@@ -77,7 +79,9 @@ phases:
       - 対象ユースケースが縦に動く
       - 既存構成を壊していない
       - 人レビューでスコープ逸脱がない
-    next: quality（サイクル完了後） / implementation（次サイクル）
+    next:
+      default: implementation
+      on_cycle_done: quality
 
   - id: quality
     name: 品質・CI・テスト
